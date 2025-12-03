@@ -1,13 +1,500 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>itisis</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>直角三角形计算器</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
+          sans-serif;
+      }
+      body {
+        background: #f8f9fa;
+        color: #333;
+        padding: 12px;
+        line-height: 1.4;
+      }
+      h1 {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 16px;
+        color: #2c3e50;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 16px;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 4px;
+        font-weight: bold;
+      }
+      .hint {
+        color: #666;
+        font-weight: normal;
+        font-size: 13px;
+        margin-left: 4px;
+      }
+      input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        height: 36px;
+        line-height: 1.2;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 16px;
+      }
+      button:active {
+        background: #2980b9;
+      }
+      .canvas-wrap {
+        margin: 20px 0;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        min-height: 320px;
+      }
+      canvas {
+        width: 100%;
+        height: 320px;
+        display: block;
+        background: #fff;
+      }
+      .result-box {
+        margin-top: 20px;
+        padding: 14px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .result-box h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 6px 0;
+        font-size: 14px;
+      }
+      .error {
+        color: #e74c3c;
+        text-align: center;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 8px;
+        }
+        .container {
+          padding: 12px;
+        }
+        h1 {
+          font-size: 18px;
+        }
+        .canvas-wrap {
+          min-height: 280px;
+        }
+        canvas {
+          height: 280px;
+        }
+        .result-item {
+          font-size: 13px;
+        }
+        input,
+        label {
+          font-size: 13px;
+        }
+        button {
+          font-size: 15px;
+          padding: 10px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div class="container">
+      <h1>直角三角形计算器</h1>
+
+      <!-- 输入表单 -->
+      <div class="input-form">
+        <div class="form-group">
+          <label for="a"> 高度<span class="hint">（边a）</span> </label>
+          <input
+            type="number"
+            id="a"
+            placeholder="例如：3"
+            step="any"
+            inputmode="decimal"
+          />
+        </div>
+        <div class="form-group">
+          <label for="b"> 水平距离<span class="hint">（边b）</span> </label>
+          <input
+            type="number"
+            id="b"
+            placeholder="例如：4"
+            step="any"
+            inputmode="decimal"
+          />
+        </div>
+        <div class="form-group">
+          <label for="c"> 坡长<span class="hint">（斜边c）</span> </label>
+          <input
+            type="number"
+            id="c"
+            placeholder="例如：5"
+            step="any"
+            inputmode="decimal"
+          />
+        </div>
+        <div class="form-group">
+          <label for="A"> 坡度<span class="hint">∠A（度）</span></label>
+          <input
+            type="number"
+            id="A"
+            placeholder="例如：36.87"
+            step="any"
+            inputmode="decimal"
+          />
+        </div>
+
+        <button onclick="calculate()">计算</button>
+      </div>
+
+      <!-- 画布区域 -->
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <!-- 错误信息 -->
+      <div id="error" class="error"></div>
+
+      <!-- 结果显示 -->
+      <div id="result" class="result-box">
+        <h2>计算结果</h2>
+        <div class="result-item">
+          <span>边 a（高度）</span><span id="out-a"></span>
+        </div>
+        <div class="result-item">
+          <span>边 b（水平距离）</span><span id="out-b"></span>
+        </div>
+        <div class="result-item">
+          <span>斜边 c（坡长）</span><span id="out-c"></span>
+        </div>
+        <div class="result-item"><span>∠A</span><span id="out-A"></span></div>
+        <div class="result-item"><span>∠B</span><span id="out-B"></span></div>
+      </div>
+    </div>
+
+    <script>
+      const DEFAULT_TRIANGLE = { a: 3, b: 4, c: 5, A: 36.87, B: 53.13 };
+
+      function calculate() {
+        const a = parseFloat(document.getElementById('a').value) || null;
+        const b = parseFloat(document.getElementById('b').value) || null;
+        const c = parseFloat(document.getElementById('c').value) || null;
+        const A = parseFloat(document.getElementById('A').value) || null;
+        const B = parseFloat(document.getElementById('B').value) || null;
+
+        document.getElementById('error').textContent = '';
+
+        const count = [a, b, c, A, B].filter((x) => x !== null).length;
+        if (count < 2) {
+          showError('请至少输入两个值');
+          return;
+        }
+
+        if (
+          (A !== null && (A <= 0 || A >= 90)) ||
+          (B !== null && (B <= 0 || B >= 90))
+        ) {
+          showError('∠A 和 ∠B 必须在 0° ~ 90° 之间');
+          return;
+        }
+        if (A !== null && B !== null && Math.abs(A + B - 90) > 1e-5) {
+          showError('∠A + ∠B 必须等于 90°');
+          return;
+        }
+
+        if (
+          (a !== null && a <= 0) ||
+          (b !== null && b <= 0) ||
+          (c !== null && c <= 0)
+        ) {
+          showError('所有边长必须大于 0');
+          return;
+        }
+
+        try {
+          const res = {};
+          if (a !== null && b !== null) {
+            res.a = a;
+            res.b = b;
+            res.c = Math.hypot(a, b);
+            res.A = rad2deg(Math.atan(a / b));
+            res.B = 90 - res.A;
+          } else if (a !== null && c !== null) {
+            if (c <= a) throw new Error('斜边 c 必须大于 a');
+            res.a = a;
+            res.c = c;
+            res.b = Math.sqrt(c * c - a * a);
+            res.A = rad2deg(Math.asin(a / c));
+            res.B = 90 - res.A;
+          } else if (b !== null && c !== null) {
+            if (c <= b) throw new Error('斜边 c 必须大于 b');
+            res.b = b;
+            res.c = c;
+            res.a = Math.sqrt(c * c - b * b);
+            res.B = rad2deg(Math.asin(b / c));
+            res.A = 90 - res.B;
+          } else if (a !== null && A !== null) {
+            const radA = deg2rad(A);
+            res.a = a;
+            res.A = A;
+            res.B = 90 - A;
+            res.b = a / Math.tan(radA);
+            res.c = a / Math.sin(radA);
+          } else if (a !== null && B !== null) {
+            const radB = deg2rad(B);
+            res.a = a;
+            res.B = B;
+            res.A = 90 - B;
+            res.b = a * Math.tan(radB);
+            res.c = a / Math.cos(radB);
+          } else if (b !== null && A !== null) {
+            const radA = deg2rad(A);
+            res.b = b;
+            res.A = A;
+            res.B = 90 - A;
+            res.a = b * Math.tan(radA);
+            res.c = b / Math.cos(radA);
+          } else if (b !== null && B !== null) {
+            const radB = deg2rad(B);
+            res.b = b;
+            res.B = B;
+            res.A = 90 - B;
+            res.a = b / Math.tan(radB);
+            res.c = b / Math.sin(radB);
+          } else if (c !== null && A !== null) {
+            const radA = deg2rad(A);
+            res.c = c;
+            res.A = A;
+            res.B = 90 - A;
+            res.a = c * Math.sin(radA);
+            res.b = c * Math.cos(radA);
+          } else if (c !== null && B !== null) {
+            const radB = deg2rad(B);
+            res.c = c;
+            res.B = B;
+            res.A = 90 - B;
+            res.a = c * Math.cos(radB);
+            res.b = c * Math.sin(radB);
+          } else {
+            throw new Error('无法根据当前输入计算三角形');
+          }
+
+          showResult(res);
+          drawTriangle(res);
+        } catch (e) {
+          showError(e.message || '计算失败，请检查输入');
+        }
+      }
+
+      function deg2rad(d) {
+        return (d * Math.PI) / 180;
+      }
+      function rad2deg(r) {
+        return (r * 180) / Math.PI;
+      }
+
+      function showError(msg) {
+        document.getElementById('error').textContent = msg;
+      }
+
+      function showResult(r) {
+        const f = (x) => (x !== undefined && x !== null ? x.toFixed(2) : 'N/A');
+        document.getElementById('out-a').textContent = f(r.a);
+        document.getElementById('out-b').textContent = f(r.b);
+        document.getElementById('out-c').textContent = f(r.c);
+        document.getElementById('out-A').textContent = f(r.A) + '°';
+        document.getElementById('out-B').textContent = f(r.B) + '°';
+      }
+      function drawTriangle(t) {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const displayWidth = canvas.offsetWidth;
+        const displayHeight = canvas.offsetHeight;
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        if (!t || t.a <= 0 || t.b <= 0 || t.c <= 0) return;
+
+        const margin = 30;
+        const availableWidth = w - 2 * margin;
+        const availableHeight = h - 2 * margin;
+
+        const scaleX = availableWidth / t.b;
+        const scaleY = availableHeight / t.a;
+        const scale = Math.min(scaleX, scaleY);
+
+        const drawnWidth = t.b * scale;
+        const drawnHeight = t.a * scale;
+
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const A = { x: centerX - drawnWidth / 2, y: centerY + drawnHeight / 2 }; // 直角（左下）
+        const B = { x: A.x + drawnWidth, y: A.y }; // 底边右端（∠A 所在）
+        const C = { x: A.x, y: A.y - drawnHeight }; // 高点（∠B 所在）
+
+        // 绘制三角形
+        ctx.beginPath();
+        ctx.moveTo(A.x, A.y);
+        ctx.lineTo(B.x, B.y);
+        ctx.lineTo(C.x, C.y);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(0, 153, 255, 0.6)';
+        ctx.fill();
+        ctx.strokeStyle = '#1976d2';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 安全文本绘制函数
+        function safeText(text, x, y, align = 'center', baseline = 'middle') {
+          ctx.font = '14px Arial';
+          ctx.textAlign = align;
+          ctx.textBaseline = baseline;
+          ctx.fillStyle = '#000';
+
+          const metrics = ctx.measureText(text);
+          const textW = metrics.width;
+          const textH = 16;
+
+          // 水平保护
+          if (align === 'center') {
+            if (x - textW / 2 < 5) x = textW / 2 + 5;
+            if (x + textW / 2 > w - 5) x = w - textW / 2 - 5;
+          } else if (align === 'left') {
+            if (x < 5) x = 5;
+            if (x > w - textW - 5) x = w - textW - 5;
+          } else if (align === 'right') {
+            if (x > w - 5) x = w - 5;
+            if (x < textW + 5) x = textW + 5;
+          }
+
+          // 垂直保护
+          if (baseline === 'middle') {
+            if (y < textH / 2 + 5) y = textH / 2 + 5;
+            if (y > h - textH / 2 - 5) y = h - textH / 2 - 5;
+          } else if (baseline === 'top') {
+            if (y < 5) y = 5;
+            if (y > h - textH - 5) y = h - textH - 5;
+          } else if (baseline === 'bottom') {
+            if (y > h - 5) y = h - 5;
+            if (y < textH + 5) y = textH + 5;
+          }
+
+          ctx.fillText(text, x, y);
+        }
+
+        // === 边长标注 ===
+        safeText(
+          `a = ${t.a.toFixed(1)}`,
+          A.x - 18,
+          (A.y + C.y) / 2,
+          'center',
+          'middle'
+        ); // 左侧
+        safeText(
+          `b = ${t.b.toFixed(1)}`,
+          (A.x + B.x) / 2,
+          A.y + 22,
+          'center',
+          'top'
+        ); // 下方
+        // 斜边 c 标注
+        const midCX = (B.x + C.x) / 2;
+        const midCY = (B.y + C.y) / 2;
+        const dx = C.x - B.x;
+        const dy = C.y - B.y;
+        const len = Math.hypot(dx, dy);
+        if (len > 0) {
+          const nx = -dy / len; // 法向量（向外）
+          const ny = dx / len;
+          const labelCX = midCX + nx * 20;
+          const labelCY = midCY + ny * 20;
+          safeText(
+            `c = ${t.c.toFixed(1)}`,
+            labelCX,
+            labelCY,
+            'center',
+            'middle'
+          );
+        }
+
+        // === ✅ 正确的角度标注位置 ===
+        // ∠A 在顶点 B（边 b 与 c 的交点）
+        safeText(
+          `∠A = ${t.A.toFixed(1)}°`,
+          B.x - 18,
+          B.y - 18,
+          'right',
+          'bottom'
+        );
+
+        const cornerSize = Math.max(6, Math.min(12, scale * 0.8)); // 根据缩放自适应，但限制范围
+        ctx.strokeStyle = '#1976d2';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        //竖线
+        ctx.moveTo(A.x + cornerSize, A.y);
+        ctx.lineTo(A.x + cornerSize, A.y - cornerSize);
+        //横线
+        ctx.moveTo(A.x + cornerSize, A.y - cornerSize);
+        ctx.lineTo(A.x, A.y - cornerSize);
+        ctx.stroke();
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        drawTriangle(DEFAULT_TRIANGLE);
+        showResult(DEFAULT_TRIANGLE);
+      });
+    </script>
   </body>
 </html>
