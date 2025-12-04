@@ -18,47 +18,80 @@
       body {
         background: #f8f9fa;
         color: #333;
-        padding: 12px;
+        padding: 16px;
         line-height: 1.4;
       }
       h1 {
         text-align: center;
-        font-size: 20px;
-        margin-bottom: 16px;
+        font-size: 22px;
+        margin-bottom: 20px;
         color: #2c3e50;
       }
       .container {
         max-width: 600px;
         margin: 0 auto;
         background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 16px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        padding: 20px;
       }
+
+      /* —————— 新输入区域样式 —————— */
       .form-group {
-        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #fafafa;
+        transition: all 0.25s ease;
+        margin-bottom: 14px;
       }
+
+      .form-group:focus-within {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        background: #fff;
+      }
+
       label {
-        display: block;
         font-size: 14px;
-        margin-bottom: 4px;
-        font-weight: bold;
+        font-weight: 600;
+        color: #2c3e50;
+        white-space: nowrap;
+        width: 90px; /* 固定宽度 */
+        text-align: center; /* 右对齐 */
+        padding-right: 8px; /* 呼吸间距 */
+        box-sizing: border-box;
       }
+
       .hint {
-        color: #666;
+        color: #7f8c8d;
         font-weight: normal;
-        font-size: 13px;
+        font-size: 12px;
         margin-left: 4px;
       }
+
       input {
-        width: 100%;
-        padding: 8px 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-        height: 2rem;
-        line-height: 1.2;
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 15px;
+        outline: none;
+        padding: 6px 0;
+        min-width: 0;
+        text-align: center;
       }
+
+      input::placeholder {
+        color: #bdc3c7;
+      }
+
+      input:disabled {
+        color: #95a5a6 !important;
+        cursor: not-allowed;
+      }
+
       button {
         width: 100%;
         padding: 12px;
@@ -69,12 +102,19 @@
         font-size: 16px;
         font-weight: bold;
         margin-top: 8px;
+        transition: opacity 0.2s, background 0.2s;
       }
-      button:active {
+      button:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      button:not(:disabled):active {
         background: #2980b9;
       }
+
       .canvas-wrap {
-        margin: 20px 0;
+        margin: 24px 0;
         background: white;
         border-radius: 10px;
         overflow: hidden;
@@ -87,57 +127,70 @@
         display: block;
         background: #fff;
       }
+
       .result-box {
-        margin-top: 20px;
-        padding: 14px;
+        margin-top: 24px;
+        padding: 16px;
         background: white;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
       .result-box h2 {
         font-size: 16px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         color: #2c3e50;
       }
       .result-item {
         display: flex;
         justify-content: space-between;
-        margin: 6px 0;
+        margin: 8px 0;
         font-size: 14px;
       }
-      .error {
-        color: #e74c3c;
-        text-align: center;
-        margin-top: 12px;
+
+      /* Poptip 样式 */
+      #poptip {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        background: #e74c3c;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
         font-size: 14px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
       }
 
       @media (max-width: 480px) {
         body {
-          padding: 8px;
-        }
-        .container {
           padding: 12px;
         }
+        .container {
+          padding: 16px;
+        }
         h1 {
-          font-size: 18px;
+          font-size: 20px;
+        }
+        .form-group {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 12px;
+        }
+        label {
+          width: 100%;
+          text-align: left;
+          padding-right: 0;
+          margin-bottom: 4px;
         }
         .canvas-wrap {
           min-height: 280px;
         }
         canvas {
           height: 280px;
-        }
-        .result-item {
-          font-size: 13px;
-        }
-        input,
-        label {
-          font-size: 13px;
-        }
-        button {
-          font-size: 15px;
-          padding: 10px;
         }
       }
     </style>
@@ -149,66 +202,65 @@
       <!-- 输入表单 -->
       <div class="input-form">
         <div class="form-group">
-          <label for="a"> 高度<span class="hint">（边a）</span> </label>
+          <label for="a">高度</label>
           <input
             type="number"
             id="a"
+            class="triangle-input"
             placeholder="例如：3"
             step="any"
             inputmode="decimal"
           />
         </div>
         <div class="form-group">
-          <label for="b"> 水平距离<span class="hint">（边b）</span> </label>
+          <label for="b">水平距离</label>
           <input
             type="number"
             id="b"
+            class="triangle-input"
             placeholder="例如：4"
             step="any"
             inputmode="decimal"
           />
         </div>
         <div class="form-group">
-          <label for="c"> 坡长<span class="hint">（斜边c）</span> </label>
+          <label for="c">坡长</label>
           <input
             type="number"
             id="c"
+            class="triangle-input"
             placeholder="例如：5"
             step="any"
             inputmode="decimal"
           />
         </div>
         <div class="form-group">
-          <label for="A"> 坡度<span class="hint">∠A（度）</span></label>
+          <label for="A">坡度</label>
           <input
             type="number"
             id="A"
+            class="triangle-input"
             placeholder="例如：36.87"
             step="any"
             inputmode="decimal"
           />
         </div>
-        <div class="form-group" style="display: NONE">
-          <label for="B"> 坡度<span class="hint">∠B（度）</span></label>
-          <input
-            type="number"
-            id="B"
-            placeholder="例如：36.87"
-            step="any"
-            inputmode="decimal"
-          />
-        </div>
+        <!-- 隐藏 B -->
+        <input
+          type="number"
+          id="B"
+          class="triangle-input"
+          style="display: none"
+          step="any"
+        />
 
-        <button onclick="calculate()">计算</button>
+        <button id="calculateBtn" onclick="calculate()">计算</button>
       </div>
 
       <!-- 画布区域 -->
       <div class="canvas-wrap">
         <canvas id="canvas"></canvas>
       </div>
-
-      <!-- 错误信息 -->
-      <div id="error" class="error"></div>
 
       <!-- 结果显示 -->
       <div id="result" class="result-box">
@@ -227,6 +279,9 @@
       </div>
     </div>
 
+    <!-- Poptip 浮层 -->
+    <div id="poptip"></div>
+
     <script>
       const DEFAULT_TRIANGLE = { a: 3, b: 4, c: 5, A: 36.87, B: 53.13 };
 
@@ -235,25 +290,15 @@
         const b = parseFloat(document.getElementById('b').value) || null;
         const c = parseFloat(document.getElementById('c').value) || null;
         const A = parseFloat(document.getElementById('A').value) || null;
-        const B = parseFloat(document.getElementById('B').value) || null;
 
-        document.getElementById('error').textContent = '';
-
-        const count = [a, b, c, A, B].filter((x) => x !== null).length;
-        if (count < 2) {
-          showError('请至少输入两个值');
+        const count = [a, b, c, A].filter((x) => x !== null).length;
+        if (count !== 2) {
+          showError('请恰好输入两个已知量');
           return;
         }
 
-        if (
-          (A !== null && (A <= 0 || A >= 90)) ||
-          (B !== null && (B <= 0 || B >= 90))
-        ) {
-          showError('∠A 和 ∠B 必须在 0° ~ 90° 之间');
-          return;
-        }
-        if (A !== null && B !== null && Math.abs(A + B - 90) > 1e-5) {
-          showError('∠A + ∠B 必须等于 90°');
+        if (A !== null && (A <= 0 || A >= 90)) {
+          showError('∠A 必须在 0° ~ 90° 之间');
           return;
         }
 
@@ -295,13 +340,6 @@
             res.B = 90 - A;
             res.b = a / Math.tan(radA);
             res.c = a / Math.sin(radA);
-          } else if (a !== null && B !== null) {
-            const radB = deg2rad(B);
-            res.a = a;
-            res.B = B;
-            res.A = 90 - B;
-            res.b = a * Math.tan(radB);
-            res.c = a / Math.cos(radB);
           } else if (b !== null && A !== null) {
             const radA = deg2rad(A);
             res.b = b;
@@ -309,13 +347,6 @@
             res.B = 90 - A;
             res.a = b * Math.tan(radA);
             res.c = b / Math.cos(radA);
-          } else if (b !== null && B !== null) {
-            const radB = deg2rad(B);
-            res.b = b;
-            res.B = B;
-            res.A = 90 - B;
-            res.a = b / Math.tan(radB);
-            res.c = b / Math.sin(radB);
           } else if (c !== null && A !== null) {
             const radA = deg2rad(A);
             res.c = c;
@@ -323,19 +354,13 @@
             res.B = 90 - A;
             res.a = c * Math.sin(radA);
             res.b = c * Math.cos(radA);
-          } else if (c !== null && B !== null) {
-            const radB = deg2rad(B);
-            res.c = c;
-            res.B = B;
-            res.A = 90 - B;
-            res.a = c * Math.cos(radB);
-            res.b = c * Math.sin(radB);
           } else {
             throw new Error('无法根据当前输入计算三角形');
           }
 
           showResult(res);
           drawTriangle(res);
+          updateInputDisabledState();
         } catch (e) {
           showError(e.message || '计算失败，请检查输入');
         }
@@ -349,7 +374,15 @@
       }
 
       function showError(msg) {
-        document.getElementById('error').textContent = msg;
+        const poptip = document.getElementById('poptip');
+        poptip.textContent = msg;
+        poptip.style.opacity = '1';
+        poptip.style.transform = 'translateX(-50%) translateY(0)';
+        clearTimeout(window.poptipTimer);
+        window.poptipTimer = setTimeout(() => {
+          poptip.style.opacity = '0';
+          poptip.style.transform = 'translateX(-50%) translateY(-10px)';
+        }, 2500);
       }
 
       function showResult(r) {
@@ -360,6 +393,7 @@
         document.getElementById('out-A').textContent = f(r.A) + '°';
         document.getElementById('out-B').textContent = f(r.B) + '°';
       }
+
       function drawTriangle(t) {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -389,11 +423,10 @@
 
         const centerX = w / 2;
         const centerY = h / 2;
-        const A = { x: centerX - drawnWidth / 2, y: centerY + drawnHeight / 2 }; // 直角（左下）
-        const B = { x: A.x + drawnWidth, y: A.y }; // 底边右端（∠A 所在）
-        const C = { x: A.x, y: A.y - drawnHeight }; // 高点（∠B 所在）
+        const A = { x: centerX - drawnWidth / 2, y: centerY + drawnHeight / 2 };
+        const B = { x: A.x + drawnWidth, y: A.y };
+        const C = { x: A.x, y: A.y - drawnHeight };
 
-        // 绘制三角形
         ctx.beginPath();
         ctx.moveTo(A.x, A.y);
         ctx.lineTo(B.x, B.y);
@@ -405,7 +438,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // 安全文本绘制函数
         function safeText(text, x, y, align = 'center', baseline = 'middle') {
           ctx.font = '14px Arial';
           ctx.textAlign = align;
@@ -416,7 +448,6 @@
           const textW = metrics.width;
           const textH = 16;
 
-          // 水平保护
           if (align === 'center') {
             if (x - textW / 2 < 5) x = textW / 2 + 5;
             if (x + textW / 2 > w - 5) x = w - textW / 2 - 5;
@@ -428,7 +459,6 @@
             if (x < textW + 5) x = textW + 5;
           }
 
-          // 垂直保护
           if (baseline === 'middle') {
             if (y < textH / 2 + 5) y = textH / 2 + 5;
             if (y > h - textH / 2 - 5) y = h - textH / 2 - 5;
@@ -443,29 +473,28 @@
           ctx.fillText(text, x, y);
         }
 
-        // === 边长标注 ===
         safeText(
           `a = ${t.a.toFixed(1)}`,
           A.x - 18,
           (A.y + C.y) / 2,
           'center',
           'middle'
-        ); // 左侧
+        );
         safeText(
           `b = ${t.b.toFixed(1)}`,
           (A.x + B.x) / 2,
           A.y + 22,
           'center',
           'top'
-        ); // 下方
-        // 斜边 c 标注
+        );
+
         const midCX = (B.x + C.x) / 2;
         const midCY = (B.y + C.y) / 2;
         const dx = C.x - B.x;
         const dy = C.y - B.y;
         const len = Math.hypot(dx, dy);
         if (len > 0) {
-          const nx = -dy / len; // 法向量（向外）
+          const nx = -dy / len;
           const ny = dx / len;
           const labelCX = midCX + nx * 20;
           const labelCY = midCY + ny * 20;
@@ -478,8 +507,6 @@
           );
         }
 
-        // === ✅ 正确的角度标注位置 ===
-        // ∠A 在顶点 B（边 b 与 c 的交点）
         safeText(
           `∠A = ${t.A.toFixed(1)}°`,
           B.x - 18,
@@ -488,22 +515,58 @@
           'bottom'
         );
 
-        const cornerSize = Math.max(6, Math.min(12, scale * 0.8)); // 根据缩放自适应，但限制范围
+        const cornerSize = Math.max(6, Math.min(12, scale * 0.8));
         ctx.strokeStyle = '#1976d2';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.beginPath();
-        //竖线
         ctx.moveTo(A.x + cornerSize, A.y);
         ctx.lineTo(A.x + cornerSize, A.y - cornerSize);
-        //横线
         ctx.moveTo(A.x + cornerSize, A.y - cornerSize);
         ctx.lineTo(A.x, A.y - cornerSize);
         ctx.stroke();
       }
+
+      function updateInputDisabledState() {
+        const inputs = ['a', 'b', 'c', 'A'].map((id) =>
+          document.getElementById(id)
+        );
+        const values = inputs.map((input) => parseFloat(input.value) || null);
+        const filledCount = values.filter((v) => v !== null).length;
+
+        inputs.forEach((input) => {
+          if (filledCount >= 2) {
+            input.disabled = input.value.trim() === '';
+          } else {
+            input.disabled = false;
+          }
+        });
+      }
+
+      function updateCalculateButtonState() {
+        const a = parseFloat(document.getElementById('a').value) || null;
+        const b = parseFloat(document.getElementById('b').value) || null;
+        const c = parseFloat(document.getElementById('c').value) || null;
+        const A = parseFloat(document.getElementById('A').value) || null;
+        const count = [a, b, c, A].filter((x) => x !== null).length;
+        const btn = document.getElementById('calculateBtn');
+        btn.disabled = count !== 2;
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
         drawTriangle(DEFAULT_TRIANGLE);
         showResult(DEFAULT_TRIANGLE);
+
+        ['a', 'b', 'c', 'A'].forEach((id) => {
+          const el = document.getElementById(id);
+          el.addEventListener('input', () => {
+            updateInputDisabledState();
+            updateCalculateButtonState();
+          });
+        });
+
+        updateInputDisabledState();
+        updateCalculateButtonState();
       });
     </script>
   </body>
